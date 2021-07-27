@@ -1,0 +1,92 @@
+_schema-version: "3.2"
+ID: hesmta
+version: 0.0.1
+modules:
+- name: hesmta-destination-content
+  type: com.sap.application.content
+  requires:
+  - name: hesmta-destination-service
+    parameters:
+      content-target: true
+  - name: hesmta_html_repo_host
+    parameters:
+      service-key:
+        name: hesmta_html_repo_host-key
+  - name: uaa_hesmta
+    parameters:
+      service-key:
+        name: uaa_hesmta-key
+  parameters:
+    content:
+      instance:
+        destinations:
+        - Name: hes_service_hesmta_html_repo_host
+          ServiceInstanceName: hesmta-html5-app-host-service
+          ServiceKeyName: hesmta_html_repo_host-key
+          sap.cloud.service: hes.service
+        - Authentication: OAuth2UserTokenExchange
+          Name: hes_service_uaa_hesmta
+          ServiceInstanceName: hesmta-xsuaa-service
+          ServiceKeyName: uaa_hesmta-key
+          sap.cloud.service: hes.service
+        existing_destinations_policy: ignore
+  build-parameters:
+    no-source: true
+- name: hesmta-app-content
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: hesmta_html_repo_host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - ypfhesmodule.zip
+      name: ypfhesmodule
+      target-path: resources/
+- name: ypfhesmodule
+  type: html5
+  path: hesmodule
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+resources:
+- name: hesmta-destination-service
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: true
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          existing_destinations_policy: update
+      version: 1.0.0
+    service: destination
+    service-name: hesmta-destination-service
+    service-plan: lite
+- name: hesmta_html_repo_host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: hesmta-html5-app-host-service
+    service-plan: app-host
+- name: uaa_hesmta
+  type: org.cloudfoundry.managed-service
+  parameters:
+    path: ./xs-security.json
+    service: xsuaa
+    service-name: hesmta-xsuaa-service
+    service-plan: application
+parameters:
+  deploy_mode: html5-repo

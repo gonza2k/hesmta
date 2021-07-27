@@ -1,0 +1,42 @@
+<mvc:View
+	controllerName="ypf.hesmodule.controller.Master"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:semantic="sap.f.semantic">
+
+	<Page id="master1Page" title="{i18n>master1Title}">
+		<subHeader>
+			<Bar id="master1SearchBar">
+				<contentMiddle>
+					<SearchField id="master1SearchField" showRefreshButton="{device>/isNoTouch}" placeholder="{i18n>master1SearchPlaceholder}" liveChange="onSearch"
+						tooltip="{i18n>master1SearchTooltip}" width="100%"></SearchField>
+				</contentMiddle>
+			</Bar>
+		</subHeader>
+		<content>
+            <List id="master1List" items="{cabeceraModel>/valores}" mode="{device>/listMode}"  noDataText="{i18n>masterListNoDataText}" select="onSelect" growing="true" growingScrollToLoad="true">
+				<items>
+					<ObjectListItem id="master1ListItem" press="onSelect" title="{cabeceraModel>ShortText}" number="{path: 'cabeceraModel>GrossVal', formatter: 'mmpu.hesaprob.formatter.Formatter.currencyValue'}"
+						 numberUnit="{cabeceraModel>Currency}">   <!--number="{cabeceraModel>GrossVal}"-->
+						<firstStatus>
+							<ObjectStatus
+								text = "{cabeceraModel>VendName}"
+								state = "Success"
+							/>
+						</firstStatus>
+						
+						<attributes>
+							<ObjectAttribute text="{cabeceraModel>SheetNo}"/>
+							<ObjectAttribute class="text-bold" text="{path: 'cabeceraModel>PostDate', formatter: 'mmpu.hesaprob.formatter.Formatter.formatFecha'}"/>
+						</attributes>
+					</ObjectListItem>
+				</items>
+			</List>
+		</content>
+		<footer>
+			<Toolbar></Toolbar>
+		</footer>
+	</Page>
+
+
+</mvc:View>
